@@ -32,4 +32,5 @@ dependencies {
 
     // Podpięcie naszego wspólnego modułu core, żeby serwer widział klasę Place
     implementation(project(":core"))
+    implementation("io.ktor:ktor-server-status-pages-jvm:3.4.1")
 }

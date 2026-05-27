@@ -31,21 +31,21 @@ object DatabaseFactory {
             // Weryfikacja (Seed): jeśli tabela jest pusta, dodajemy startowe kawiarnie
             if (PlacesTable.selectAll().count() == 0L) {
                 PlacesTable.insert {
-                    it[id] = "starbucks-central"
-                    it[name] = "Starbucks Central"
+                    it[id] = "green-cafe-nero"
+                    it[name] = "Green Cafe Nero"
                     it[description] = "Twoja ulubiona kawa w samym centrum miasta. Świetne miejsce do nauki i pracy z laptopem."
-                    it[address] = "Marszałkowska 100, Warszawa"
-                    it[imageUrl] = "http://localhost:8080/static/starbucks.jpg" // Ścieżka statyczna z serwera
+                    it[address] = "Marszałkowska 84/92, Warszawa"
+                    it[imageUrl] = "http://localhost:8080/static/green_cafe_nero.jpg" // Ścieżka statyczna z serwera
                     it[rating] = 4.2
                     it[isVisited] = false
                 }
 
                 PlacesTable.insert {
-                    it[id] = "kawiarnia-pod-amorem"
-                    it[name] = "Kawiarnia Pod Amorem"
-                    it[description] = "Przytulna, rzemieślnicza kawiarnia z domowymi wypiekami i alternatywnymi metodami parzenia."
-                    it[address] = "Nowy Świat 25, Warszawa"
-                    it[imageUrl] = "http://localhost:8080/static/amor.jpg"
+                    it[id] = "moya-matcha"
+                    it[name] = "Moya Matcha"
+                    it[description] = "Przytulna, stylowa herbaciarnia."
+                    it[address] = "Oleandrów 6, Warszawa"
+                    it[imageUrl] = "http://localhost:8080/static/moya_matcha.jpg"
                     it[rating] = 4.8
                     it[isVisited] = true
                 }
