@@ -39,6 +39,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
+            implementation("io.ktor:ktor-client-okhttp:3.4.1")
         }
         commonMain.dependencies {
             api(projects.core)
@@ -50,12 +51,23 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation("io.ktor:ktor-client-core:3.4.1")
+            implementation("io.ktor:ktor-client-content-negotiation:3.4.1")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.1")
+            // Biblioteka Kamel do asynchronicznego ładowania obrazków (wymóg prowadzącego)
+            implementation("media.kamel:kamel-image:0.9.3")
+            // Obsługa ViewModelu w Kotlin Multiplatform
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
+        }
+        jvmMain.dependencies {
+            // Silnik OkHttp dla Desktopu
+            implementation("io.ktor:ktor-client-okhttp:3.4.1")
         }
     }
 }

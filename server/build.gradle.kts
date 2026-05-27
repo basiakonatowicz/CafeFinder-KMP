@@ -31,6 +31,6 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 
     // Podpięcie naszego wspólnego modułu core, żeby serwer widział klasę Place
-    implementation(project(":core"))
+    implementation(project(":app:shared"))
     implementation("io.ktor:ktor-server-status-pages-jvm:3.4.1")
 }
