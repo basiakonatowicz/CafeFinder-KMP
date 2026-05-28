@@ -6,20 +6,21 @@ plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 kotlin {
     jvm()
     
-    js {
+    /*js {
         browser()
     }
-    
+    */
     @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+    /*wasmJs {
         browser()
     }
-    
+    */
     androidLibrary {
        namespace = "pl.konatowicz.cafefinder.app.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -55,19 +56,23 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:3.4.1")
             implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.1")
             // Biblioteka Kamel do asynchronicznego ładowania obrazków (wymóg prowadzącego)
-            implementation("media.kamel:kamel-image:0.9.3")
+            implementation("media.kamel:kamel-image-default:1.0.0")
             // Obsługa ViewModelu w Kotlin Multiplatform
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-        jsMain.dependencies {
+        /*jsMain.dependencies {
             implementation(libs.wrappers.browser)
-        }
+        }*/
         jvmMain.dependencies {
             // Silnik OkHttp dla Desktopu
             implementation("io.ktor:ktor-client-okhttp:3.4.1")
+            // Brakująca biblioteka z wykładu! Odblokowuje wątki graficzne na PC
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0")
+            // Brakujący silnik dla biblioteki Kamel na Desktopie!
+            implementation("io.ktor:ktor-client-cio:3.4.1")
         }
     }
 }
