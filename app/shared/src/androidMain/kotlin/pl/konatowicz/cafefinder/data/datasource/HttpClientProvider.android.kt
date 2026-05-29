@@ -4,9 +4,7 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.okhttp.OkHttp
 
-// Wersja mobilna również opiera się na stabilnym OkHttp
-actual fun provideEngine(): HttpClientEngineFactory<*> = OkHttp
+actual val HOST_IP: String = "10.0.2.2"
 
-actual fun HttpClientConfig<*>.platformConfig() {
-    // Specyficzna konfiguracja dla Androida (np. timeouty)
-}
+actual fun provideEngine(): HttpClientEngineFactory<*> = OkHttp
+actual fun HttpClientConfig<*>.platformConfig() { }

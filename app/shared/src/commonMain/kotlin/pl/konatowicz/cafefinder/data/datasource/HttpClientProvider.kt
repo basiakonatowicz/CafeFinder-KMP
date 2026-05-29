@@ -11,7 +11,11 @@ import kotlinx.serialization.json.Json
 // Konfiguracja adresu Twojego serwera.
 // "10.0.2.2" to specjalny adres dla emulatora Androida, by widział "localhost" Twojego komputera.
 // Dla Desktopu powinieneś używać "http://localhost:8080".
-const val BASE_URL = "http://localhost:8080" //"http://10.0.2.2:8080"
+// Każda platforma poda swój własny adres IP
+expect val HOST_IP: String
+
+// Generujemy ostateczny URL
+val BASE_URL = "http://$HOST_IP:8080"
 
 expect fun provideEngine(): HttpClientEngineFactory<*>
 expect fun HttpClientConfig<*>.platformConfig()

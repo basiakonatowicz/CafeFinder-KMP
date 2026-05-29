@@ -56,7 +56,7 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:3.4.1")
             implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.1")
             // Biblioteka Kamel do asynchronicznego ładowania obrazków (wymóg prowadzącego)
-            implementation("media.kamel:kamel-image-default:1.0.0")
+            implementation("media.kamel:kamel-image-default:1.0.9")
             // Obsługa ViewModelu w Kotlin Multiplatform
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
         }

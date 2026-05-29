@@ -35,7 +35,7 @@ object DatabaseFactory {
                     it[name] = "Green Cafe Nero"
                     it[description] = "Twoja ulubiona kawa w samym centrum miasta. Świetne miejsce do nauki i pracy z laptopem."
                     it[address] = "Marszałkowska 84/92, Warszawa"
-                    it[imageUrl] = "http://localhost:8080/static/green_cafe_nero.jpg" // Ścieżka statyczna z serwera
+                    it[imageUrl] = "/static/green_cafe_nero.jpg" // Ścieżka statyczna z serwera
                     it[rating] = 4.2
                     it[isVisited] = false
                 }
@@ -45,7 +45,7 @@ object DatabaseFactory {
                     it[name] = "Moya Matcha"
                     it[description] = "Przytulna, stylowa herbaciarnia."
                     it[address] = "Oleandrów 6, Warszawa"
-                    it[imageUrl] = "http://localhost:8080/static/moya_matcha.jpg"
+                    it[imageUrl] = "/static/moya_matcha.jpg"
                     it[rating] = 4.8
                     it[isVisited] = true
                 }

@@ -4,9 +4,7 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.okhttp.OkHttp
 
-// Dostarczamy silnik OkHttp dla platformy JVM/Desktop
-actual fun provideEngine(): HttpClientEngineFactory<*> = OkHttp
+actual val HOST_IP: String = "localhost"
 
-actual fun HttpClientConfig<*>.platformConfig() {
-    // Tutaj można dodać np. logowanie dla Desktopu, na ten moment zostawiamy puste
-}
+actual fun provideEngine(): HttpClientEngineFactory<*> = OkHttp
+actual fun HttpClientConfig<*>.platformConfig() { }
