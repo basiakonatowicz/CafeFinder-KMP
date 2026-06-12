@@ -1,5 +1,7 @@
 package pl.konatowicz.cafefinder.presentation
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,14 +19,15 @@ import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import pl.konatowicz.cafefinder.domain.model.Place
+import pl.konatowicz.cafefinder.data.datasource.BASE_URL
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceListScreen(viewModel: PlaceListViewModel) {
     val places by viewModel.places.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val listState = rememberLazyListState()
 
-    // Scaffold to "rusztowanie" ekranu, idealne do dodania paska górnego
     Scaffold(
         topBar = {
             TopAppBar(
@@ -36,20 +39,31 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues), // Respektuje miejsce zajęte przez górny pasek
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp) // Równe odstępy między kartami
-        ) {
-            items(places) { place ->
-                PlaceItem(
-                    place = place,
-                    // Przekazujemy ID kawiarni oraz informację, czy jest OBECNIE odwiedzona
-                    onVisitClick = { viewModel.toggleVisitStatus(place.id, place.isVisited) }
-                )
+        Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { viewModel.updateSearchQuery(it) },
+                label = { Text("Szukaj kawiarni lub adresu...") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Naprawione! Zwykłe czyste items bez "count ="
+                items(places) { place ->
+                    PlaceItem(
+                        place = place,
+                        onVisitClick = { viewModel.toggleVisitStatus(place.id, place.isVisited) }
+                    )
+                }
             }
         }
     }
@@ -57,27 +71,33 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
 
 @Composable
 fun PlaceItem(place: Place, onVisitClick: () -> Unit) {
+
+    val animatedButtonColor by animateColorAsState(
+        targetValue = if (place.isVisited) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+        animationSpec = tween(durationMillis = 500)
+    )
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp), // Mocniejsze, nowoczesne zaokrąglenia
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column {
             KamelImage(
-                resource = asyncPainterResource(data = "${pl.konatowicz.cafefinder.data.datasource.BASE_URL}${place.imageUrl}"),
+                resource = asyncPainterResource(data = "$BASE_URL${place.imageUrl}"),
                 contentDescription = place.name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(220.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)), // Obrazek zaokrąglony tylko od góry
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
                 contentScale = ContentScale.Crop,
                 onLoading = {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                 },
-                onFailure = { exception ->
+                onFailure = {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("Brak zdjęcia", color = MaterialTheme.colorScheme.error)
                     }
@@ -85,31 +105,19 @@ fun PlaceItem(place: Place, onVisitClick: () -> Unit) {
             )
 
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = place.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
+                Text(text = place.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = place.address,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary // Wyróżniony kolor adresu
-                )
+                Text(text = place.address, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = place.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                // NOWY, ODBLOKOWANY PRZYCISK:
+                Text(text = place.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Button(
                     onClick = onVisitClick,
-                    // Usunęliśmy 'enabled = false', przycisk zawsze działa!
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        // Jeśli odwiedzona: Zielony. Jeśli nie: Domyślny kolor aplikacji
-                        containerColor = if (place.isVisited) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                        containerColor = animatedButtonColor,
                         contentColor = Color.White
                     )
                 ) {

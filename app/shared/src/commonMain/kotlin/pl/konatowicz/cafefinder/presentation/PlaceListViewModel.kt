@@ -4,49 +4,57 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import pl.konatowicz.cafefinder.data.datasource.BASE_URL
-import pl.konatowicz.cafefinder.data.repository.PlaceRepositoryImpl
 import pl.konatowicz.cafefinder.domain.model.Place
 import pl.konatowicz.cafefinder.domain.repository.PlaceRepository
 
-class PlaceListViewModel : ViewModel() {
+class PlaceListViewModel(private val repository: PlaceRepository = pl.konatowicz.cafefinder.data.repository.PlaceRepositoryImpl()) : ViewModel() {
 
-    // Inicjalizujemy nasze repozytorium
-    private val repository: PlaceRepository = PlaceRepositoryImpl()
-
-    // Stan (StateFlow), który będzie obserwowany przez interfejs użytkownika
     private val _places = MutableStateFlow<List<Place>>(emptyList())
-    val places: StateFlow<List<Place>> = _places.asStateFlow()
+    val places: StateFlow<List<Place>> = _places
+
+    private var allPlaces = listOf<Place>()
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
 
     init {
         loadPlaces()
     }
 
-    private fun loadPlaces() {
-        viewModelScope.launch {
-            // Paginacja: na start pobieramy pierwszą stronę, max 20 elementów (wymóg prowadzącego!)
-            val result = repository.getPlaces(page = 1, size = 20)
-            _places.value = result
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        filterList()
+    }
+
+    private fun filterList() {
+        val query = _searchQuery.value
+        if (query.isBlank()) {
+            _places.value = allPlaces
+        } else {
+            _places.value = allPlaces.filter {
+                it.name.contains(query, ignoreCase = true) || it.address.contains(query, ignoreCase = true)
+            }
         }
     }
+
+    private fun loadPlaces() {
+        viewModelScope.launch {
+            val result = repository.getPlaces(1, 20)
+            allPlaces = result
+            filterList()
+        }
+    }
+
     fun toggleVisitStatus(placeId: String, currentState: Boolean) {
         viewModelScope.launch {
             try {
-                // Odwracamy obecny stan o 180 stopni (magia wykrzyknika)
                 val newState = !currentState
-
-                // Wysyłamy do repozytorium
                 repository.markAsVisited(placeId, newState)
-
-                // Odświeżamy listę
                 loadPlaces()
-
             } catch (e: Exception) {
                 println("Błąd podczas aktualizacji: ${e.message}")
             }
         }
     }
-
 }
