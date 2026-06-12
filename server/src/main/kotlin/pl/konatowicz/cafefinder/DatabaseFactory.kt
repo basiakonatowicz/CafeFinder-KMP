@@ -39,6 +39,33 @@ object DatabaseFactory {
                     it[rating] = 4.2
                     it[isVisited] = false
                 }
+                PlacesTable.insert {
+                    it[id] = "starbucks"
+                    it[name] = "Starbucks"
+                    it[description] = "Wiralowa kawiarnia z USA."
+                    it[address] = "Marszałkowska 84/92, Warszawa"
+                    it[imageUrl] = "/static/starbucks.jpg" // Ścieżka statyczna z serwera
+                    it[rating] = 4.2
+                    it[isVisited] = false
+                }
+                PlacesTable.insert {
+                    it[id] = "ministerstwo"
+                    it[name] = "Ministerstwo Kawy"
+                    it[description] = "Twoja ulubiona kawa w samym centrum miasta. Świetne miejsce do nauki i pracy z laptopem."
+                    it[address] = "Marszałkowska 27/35, Warszawa"
+                    it[imageUrl] = "/static/ministerstwo.jpg" // Ścieżka statyczna z serwera
+                    it[rating] = 4.2
+                    it[isVisited] = false
+                }
+                PlacesTable.insert {
+                    it[id] = "costa-coffe"
+                    it[name] = "Costa Coffe"
+                    it[description] = "Twoja ulubiona kawa w samym centrum miasta. Świetne miejsce do nauki i pracy z laptopem."
+                    it[address] = "Marszałkowska 84/92, Warszawa"
+                    it[imageUrl] = "/static/costa.jpg" // Ścieżka statyczna z serwera
+                    it[rating] = 4.2
+                    it[isVisited] = false
+                }
 
                 PlacesTable.insert {
                     it[id] = "moya-matcha"

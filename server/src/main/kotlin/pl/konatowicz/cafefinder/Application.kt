@@ -12,6 +12,8 @@ import io.ktor.server.routing.*
 import io.ktor.server.http.content.*
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import pl.konatowicz.cafefinder.PlacesTable.isVisited
 import pl.konatowicz.cafefinder.domain.model.Place
 
 fun main() {
@@ -105,6 +107,19 @@ fun main() {
                 } else {
                     call.respond(place)
                 }
+            }
+            put("/places/{id}/visit") {
+                val placeId = call.parameters["id"] ?: return@put call.respond(HttpStatusCode.BadRequest)
+
+                // NOWOŚĆ: Pobieramy docelowy stan z adresu URL. Jak go nie ma, domyślnie dajemy true
+                val newState = call.request.queryParameters["state"]?.toBoolean() ?: true
+
+                transaction {
+                    PlacesTable.update({ PlacesTable.id eq placeId }) {
+                        it[isVisited] = newState // Wpisujemy do bazy nowy stan!
+                    }
+                }
+                call.respond(HttpStatusCode.OK, "Zaktualizowano status na $newState")
             }
         }
     }.start(wait = true)

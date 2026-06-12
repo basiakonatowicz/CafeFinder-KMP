@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,14 +45,18 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
             verticalArrangement = Arrangement.spacedBy(16.dp) // Równe odstępy między kartami
         ) {
             items(places) { place ->
-                PlaceItem(place = place)
+                PlaceItem(
+                    place = place,
+                    // Przekazujemy ID kawiarni oraz informację, czy jest OBECNIE odwiedzona
+                    onVisitClick = { viewModel.toggleVisitStatus(place.id, place.isVisited) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun PlaceItem(place: Place) {
+fun PlaceItem(place: Place, onVisitClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp), // Mocniejsze, nowoczesne zaokrąglenia
@@ -97,6 +102,19 @@ fun PlaceItem(place: Place) {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                // NOWY, ODBLOKOWANY PRZYCISK:
+                Button(
+                    onClick = onVisitClick,
+                    // Usunęliśmy 'enabled = false', przycisk zawsze działa!
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        // Jeśli odwiedzona: Zielony. Jeśli nie: Domyślny kolor aplikacji
+                        containerColor = if (place.isVisited) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(if (place.isVisited) "Odwiedzono! (Kliknij, by cofnąć) ↩" else "Oznacz jako odwiedzone ✓")
+                }
             }
         }
     }
