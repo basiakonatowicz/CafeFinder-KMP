@@ -8,7 +8,9 @@ import kotlinx.coroutines.launch
 import pl.konatowicz.cafefinder.domain.model.Place
 import pl.konatowicz.cafefinder.domain.repository.PlaceRepository
 
-class PlaceListViewModel(private val repository: PlaceRepository = pl.konatowicz.cafefinder.data.repository.PlaceRepositoryImpl()) : ViewModel() {
+class PlaceListViewModel(
+    private val repository: PlaceRepository = pl.konatowicz.cafefinder.data.repository.PlaceRepositoryImpl()
+) : ViewModel() {
 
     private val _places = MutableStateFlow<List<Place>>(emptyList())
     val places: StateFlow<List<Place>> = _places
@@ -40,9 +42,13 @@ class PlaceListViewModel(private val repository: PlaceRepository = pl.konatowicz
 
     private fun loadPlaces() {
         viewModelScope.launch {
-            val result = repository.getPlaces(1, 20)
-            allPlaces = result
-            filterList()
+            try {
+                val result = repository.getPlaces(1, 20)
+                allPlaces = result
+                filterList()
+            } catch (e: Exception) {
+                println("Błąd pobierania: ${e.message}")
+            }
         }
     }
 
@@ -54,6 +60,18 @@ class PlaceListViewModel(private val repository: PlaceRepository = pl.konatowicz
                 loadPlaces()
             } catch (e: Exception) {
                 println("Błąd podczas aktualizacji: ${e.message}")
+            }
+        }
+    }
+
+    // Funkcja od dodawania własnych kawiarni!
+    fun addPlace(name: String, address: String, description: String, imageUrl: String) {
+        viewModelScope.launch {
+            try {
+                repository.addPlace(name, address, description, imageUrl)
+                loadPlaces()
+            } catch (e: Exception) {
+                println("Błąd podczas dodawania kawiarni: ${e.message}")
             }
         }
     }

@@ -28,6 +28,8 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val listState = rememberLazyListState()
 
+    var showAddDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -37,6 +39,11 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showAddDialog = true }) {
+                Text("+", style = MaterialTheme.typography.titleLarge)
+            }
         }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
@@ -46,9 +53,7 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
                 onValueChange = { viewModel.updateSearchQuery(it) },
                 label = { Text("Szukaj kawiarni lub adresu...") },
                 singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
             LazyColumn(
@@ -57,7 +62,6 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Naprawione! Zwykłe czyste items bez "count ="
                 items(places) { place ->
                     PlaceItem(
                         place = place,
@@ -65,6 +69,41 @@ fun PlaceListScreen(viewModel: PlaceListViewModel) {
                     )
                 }
             }
+        }
+
+        if (showAddDialog) {
+            var newName by remember { mutableStateOf("") }
+            var newAddress by remember { mutableStateOf("") }
+            var newDescription by remember { mutableStateOf("") }
+            var newImageUrl by remember { mutableStateOf("") }
+
+            AlertDialog(
+                onDismissRequest = { showAddDialog = false },
+                title = { Text("Dodaj nową kawiarnię") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(value = newName, onValueChange = { newName = it }, label = { Text("Nazwa") })
+                        OutlinedTextField(value = newAddress, onValueChange = { newAddress = it }, label = { Text("Adres") })
+                        OutlinedTextField(value = newDescription, onValueChange = { newDescription = it }, label = { Text("Krótki opis") })
+                        OutlinedTextField(value = newImageUrl, onValueChange = { newImageUrl = it }, label = { Text("Link do zdjęcia (np. /static/costa.jpg)") })
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        if (newName.isNotBlank() && newAddress.isNotBlank()) {
+                            viewModel.addPlace(newName, newAddress, newDescription, newImageUrl)
+                            showAddDialog = false
+                        }
+                    }) {
+                        Text("Zapisz")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showAddDialog = false }) {
+                        Text("Anuluj")
+                    }
+                }
+            )
         }
     }
 }
@@ -77,6 +116,12 @@ fun PlaceItem(place: Place, onVisitClick: () -> Unit) {
         animationSpec = tween(durationMillis = 500)
     )
 
+    val fullImageUrl = if (place.imageUrl.startsWith("http")) {
+        place.imageUrl
+    } else {
+        "$BASE_URL${place.imageUrl}"
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -85,23 +130,15 @@ fun PlaceItem(place: Place, onVisitClick: () -> Unit) {
     ) {
         Column {
             KamelImage(
-                resource = asyncPainterResource(data = "$BASE_URL${place.imageUrl}"),
+                resource = asyncPainterResource(data = fullImageUrl),
                 contentDescription = place.name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(220.dp)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
                 contentScale = ContentScale.Crop,
-                onLoading = {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                },
-                onFailure = {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Brak zdjęcia", color = MaterialTheme.colorScheme.error)
-                    }
-                }
+                onLoading = { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() } },
+                onFailure = { Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Brak zdjęcia", color = MaterialTheme.colorScheme.error) } }
             )
 
             Column(modifier = Modifier.padding(16.dp)) {
